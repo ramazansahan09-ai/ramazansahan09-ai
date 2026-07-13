@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2 ₺ Yazı Tura Oyunu</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        /* Madeni Para Konteyneri */
+        .coin-container {
+            perspective: 1000px;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
+            cursor: pointer;
+        }
+
+        /* Para Gövdesi */
+        .coin {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Manuel sürükleme/tıklama hissi için */
+        }
+
+        /* Havaya fırlatma animasyonu sınıfı */
+        .coin.flip-animation-yazi {
+            animation: flipYazi 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .coin.flip-animation-tura {
+            animation: flipTura 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Paranın Yüzleri */
+        .side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.4);
+            /* 2 TL'nin çift metal (Bimetalik) yapısı */
+            border: 8px solid #ffd700; /* Dış halka bronz/altın rengi */
+            box-sizing: border-box;
+        }
+
+        /* ÖN YÜZ (YAZI) */
+        .yazi {
+            background: radial-gradient(circle, #e0e0e0 0%, #b8b8b8 100%); /* İç göbek gümüş */
+            color: #333;
+        }
+
+        .yazi .value {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1;
+            color: #222;
+        }
+
+        .yazi .symbol {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: -5px;
+        }
+
+        .yazi .pattern {
+            font-size: 10px;
+            color: #777;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* ARKA YÜZ (TURA) */
+        .tura {
+            background: radial-gradient(circle, #e0e0e0 0%, #b8b8b8 100%);
+            color: #222;
+            transform: rotateY(180deg);
+        }
+
+        /* Ayasofya Camii Silüeti Temsili */
+        .mosque-icon {
+            font-size: 45px;
+            line-height: 1;
+        }
+
+        .tura .label {
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .year {
+            font-size: 10px;
+            color: #555;
+            margin-top: 2px;
+        }
+
+        /* Fırlat Butonu */
+        .btn {
+            background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+            border: none;
+            color: #111;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: #555;
+            color: #888;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Durum Mesajı */
+        .status {
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: 600;
+            height: 30px;
+            color: #ffd700;
+        }
+
+        /* Animasyon Tanımları (Bolca dönüş ve yükseklik hissi) */
+        @keyframes flipYazi {
+            0% {
+                transform: translateY(0) rotateY(0);
+            }
+            30% {
+                transform: translateY(-150px) rotateY(720deg);
+            }
+            100% {
+                transform: translateY(0) rotateY(1800deg); /* 1800 derece -> 5 tam tur ve YAZI yüzünde durur */
+            }
+        }
+
+        @keyframes flipTura {
+            0% {
+                transform: translateY(0) rotateY(0);
+            }
+            30% {
+                transform: translateY(-150px) rotateY(720deg);
+            }
+            100% {
+                transform: translateY(0) rotateY(1980deg); /* 1980 derece -> 5.5 tur ve TURA yüzünde durur */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>2 ₺ Yazı - Tura</h1>
+    <p>Paraya tıklayarak veya aşağıdaki butona basarak fırlat!</p>
+
+    <!-- Madeni Para -->
+    <div class="coin-container" onclick="firlat()">
+        <div class="coin" id="coin">
+            <!-- Ön Yüz: Yazı -->
+            <div class="side yazi">
+                <div class="value">2</div>
+                <div class="symbol">₺</div>
+                <div class="pattern">❖ ❖ ❖</div>
+            </div>
+            <!-- Arka Yüz: Tura -->
+            <div class="side tura">
+                <div class="mosque-icon">🕌</div>
+                <div class="label">Türkiye<br>Yüzyılı</div>
+                <div class="year">2026</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kontroller -->
+    <button class="btn" id="firlatBtn" onclick="firlat()">Fırlat!</button>
+    <div class="status" id="status">Sonuç bekleniyor...</div>
+
+    <script>
+        const coin = document.getElementById('coin');
+        const btn = document.getElementById('firlatBtn');
+        const statusText = document.getElementById('status');
+        let isSpinning = false;
+
+        function firlat() {
+            if (isSpinning) return; // Çift tıklamayı engelle
+            
+            isSpinning = true;
+            btn.disabled = true;
+            statusText.innerText = "Para havada süzülüyor...";
+
+            // Önceki animasyon sınıflarını temizle
+            coin.classList.remove('flip-animation-yazi', 'flip-animation-tura');
+            
+            // Tarayıcının animasyon sıfırlamasını algılaması için ufak bir gecikme yapıyoruz
+            setTimeout(() => {
+                // Rastgele sonuç belirle (0.5 olasılık)
+                const isYazi = Math.random() < 0.5;
+
+                if (isYazi) {
+                    coin.classList.add('flip-animation-yazi');
+                } else {
+                    coin.classList.add('flip-animation-tura');
+                }
+
+                // Animasyon bittiğinde (1.8 saniye sonra) sonucu yazdır
+                setTimeout(() => {
+                    if (isYazi) {
+                        statusText.innerText = "🎯 Sonuç: YAZI (2 ₺) geldi!";
+                    } else {
+                        statusText.innerText = "🎯 Sonuç: TURA (Ayasofya) geldi!";
+                    }
+                    isSpinning = false;
+                    btn.disabled = false;
+                }, 1800);
+
+            }, 50);
+        }
+    </script>
+</body>
+</html>
